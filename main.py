@@ -3,7 +3,7 @@
 
 # events-cert-autoname
 # 
-# Version: v0.1.1
+# Version: v0.1.2
 # Date: 2020-02-14
 
 # Copyright (c) 2020 Abderraouf Adjal <abderraouf.adjal@gmail.com>
@@ -28,17 +28,19 @@
 #
 # Usage example:
 #   % python3 main.py --list "list.csv" --cert "cert.png" --outdir "certs_output" --y 200 --fontfile "et-book-bold-line-figures.ttf" --colorhex "#000000"
-# Install requirements (PIL/Pillow for py3):
+# Install requirements:
 #   % pip3 install --user -r requirements.txt
 #
+# NOTE: For Arabic names, try to use the font <DejaVuSans.ttf>
 # This script tested for GNU/Linux OS.
 
 import os
 import sys
 import csv
 import argparse
+import arabic_reshaper
 from PIL import Image, ImageFont, ImageDraw
-
+from bidi.algorithm import get_display
 
 def get_input_args():
     parser = argparse.ArgumentParser()
@@ -83,14 +85,16 @@ def make_person_cert(name, email, empty_cert_img, outdir, fontfile, fontsize, co
     img = Image.open(empty_cert_img).convert('RGB')
     draw = ImageDraw.Draw(img)
     font = ImageFont.truetype(font=fontfile, size=fontsize)
-    
+    name_reshaped = arabic_reshaper.reshape(name) # Correct shape
+    name_reshaped_directed = get_display(name_reshaped) # Correct direction
+
     # Text in center as default option
     if (x is None):
-        x = int((img.size[0] - font.getsize(name)[0]) / 2)
+        x = int((img.size[0] - font.getsize(name_reshaped_directed)[0]) / 2)
     if (y is None):
-        y = int((img.size[1] - font.getsize(name)[1]) / 2)
+        y = int((img.size[1] - font.getsize(name_reshaped_directed)[1]) / 2)
     
-    draw.text((x, y), name, fill=color_tuple, font=font, align='center') # ((x, y),"Text",(r,g,b))
+    draw.text((x, y), name_reshaped_directed, fill=color_tuple, font=font, align='center') # ((x, y),"Text",(r,g,b))
     img.save(out_img, format='PDF')
     return True
 
