@@ -3,8 +3,8 @@
 
 # events-cert-autoname
 # 
-# Version: v0.1.0
-# Date: 2020-02-13
+# Version: v0.1.1
+# Date: 2020-02-14
 
 # Copyright (c) 2020 Abderraouf Adjal <abderraouf.adjal@gmail.com>
 # 
@@ -23,11 +23,14 @@
 # Tool to write names on a list to an image.
 # This is used to save time when generate attendance certificates for events.
 #
-# For help:  % python3 main.py --help
+# For help:
+#   % python3 main.py --help
 #
-# Example:   % python3 main.py --list "list.csv" --cert "cert.png" --outdir "certs_output" --y 200 --fontfile "font.ttf" --colorhex "#000000"
+# Usage example:
+#   % python3 main.py --list "list.csv" --cert "cert.png" --outdir "certs_output" --y 200 --fontfile "et-book-bold-line-figures.ttf" --colorhex "#000000"
+# Install requirements (PIL/Pillow for py3):
+#   % pip3 install --user -r requirements.txt
 #
-# Install PIL/Pillow for py3:  %pip3 install --user Pillow
 # This script tested for GNU/Linux OS.
 
 import os
@@ -40,22 +43,22 @@ from PIL import Image, ImageFont, ImageDraw
 def get_input_args():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--cert', type = str, default = 'cert.png', 
+    parser.add_argument('--cert', type=str, default='cert.png', 
                         help = 'Path to certificate image file.')
-    parser.add_argument('--list', type = str, default = 'list.csv', 
+    parser.add_argument('--list', type=str, default='list.csv', 
                         help = 'Path to names list CSV file (NAME, EMAIL).')
-    parser.add_argument('--outdir', type = str, default = 'certs_output/', 
+    parser.add_argument('--outdir', type=str, default='certs_output/', 
                         help = 'Path to the export folder.')
-    parser.add_argument('--fontfile', type = str, default = 'font.ttf', 
+    parser.add_argument('--fontfile', type=str, default='et-book-bold-line-figures.ttf', 
                         help = 'Font file (truetype).')
-    parser.add_argument('--fontsize', type = int, default = 48, 
+    parser.add_argument('--fontsize', type=int, default=48, 
                         help = 'Font size.')
-    parser.add_argument('--colorhex', type = str, default = '000000', 
+    parser.add_argument('--colorhex', type=str, default='000000', 
                         help = 'RGB font color in HEX.')
-    parser.add_argument('--x', type = int, default = -99, 
+    parser.add_argument('--x', type=int, default=None, 
                         help = 'Text position X, In center by default.')
-    parser.add_argument('--y', type = int, default = 0, 
-                        help = 'Text position Y.')
+    parser.add_argument('--y', type=int, default=None, 
+                        help = 'Text position Y, In center by default.')
 
     return parser.parse_args()
 
@@ -72,23 +75,23 @@ def csv_to_dict(ppl, namesfile):
 def make_person_cert(name, email, empty_cert_img, outdir, fontfile, fontsize, color_tuple, x, y):
     out_img = os.path.join(outdir, '{0}+{1}+{2}.pdf'.format(os.path.splitext(empty_cert_img)[0].split('/')[-1], name, email))
     if (os.path.exists(out_img) == True):
-        print('\n  ** Warning: The path for output "{0}" exists.'.format(out_img), file = sys.stderr)
+        print('\n  ** WARNING: The path for output "{0}" exists.'.format(out_img), file=sys.stderr)
         q = str(input('  >> Replace the file? [Y or N] (N): ')).lower().strip()
         if (q != 'y'):
             return False
     
     img = Image.open(empty_cert_img).convert('RGB')
     draw = ImageDraw.Draw(img)
-    font = ImageFont.truetype(fontfile, fontsize) # (<font-file>, <font-size>)
+    font = ImageFont.truetype(font=fontfile, size=fontsize)
     
     # Text in center as default option
-    if (x == -99):
-        pos = (int((img.size[0] - font.getsize(name)[0]) / 2), y)
-    else:
-        pos = (x, y)
+    if (x is None):
+        x = int((img.size[0] - font.getsize(name)[0]) / 2)
+    if (y is None):
+        y = int((img.size[1] - font.getsize(name)[1]) / 2)
     
-    draw.text(pos, name, color_tuple, font=font) # ((x, y),"Text",(r,g,b))
-    img.save(out_img, 'PDF')
+    draw.text((x, y), name, fill=color_tuple, font=font, align='center') # ((x, y),"Text",(r,g,b))
+    img.save(out_img, format='PDF')
     return True
 
 
@@ -99,11 +102,11 @@ def main():
         try:
             os.makedirs(in_arg.outdir)
         except:
-            print('  ** Error: Can NOT make the output folder. Exit.', file = sys.stderr)
+            print('  ** ERROR: Can NOT make the output folder. Exit.', file=sys.stderr)
             exit(1)
         
     if (os.path.isdir(in_arg.outdir) == False):
-        print('  ** Error: "{0}" is not a folder. Exit.'.format(in_arg.outdir), file = sys.stderr)
+        print('  ** ERROR: "{0}" is not a folder. Exit.'.format(in_arg.outdir), file=sys.stderr)
         exit(1)
 
     colorhex = in_arg.colorhex.lstrip('#')
@@ -124,7 +127,7 @@ def main():
                 print('{0}  -  {1}'.format(person[0], person[1]))
                 count += 1
         except:
-            print('  ** Error: With [{0}, {1}]. Exit.'.format(person[0], person[1]), file = sys.stderr)
+            print('  ** ERROR: With [{0}, {1}]. Exit.'.format(person[0], person[1]), file=sys.stderr)
             exit(1)
         
     print('\nTotal of "{0}" files made in "{1}".'.format(count, in_arg.outdir))
