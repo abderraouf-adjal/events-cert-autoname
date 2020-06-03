@@ -1,12 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# events-cert-autoname
+# SPDX-License-Identifier: ISC
 # 
-# Version: v0.1.3
-# Date: 2020-02-14
-
-# Copyright (c) 2020 Abderraouf Adjal <abderraouf.adjal@gmail.com>
+# Copyright (c) 2020 Abderraouf Adjal
 # 
 # Permission to use, copy, modify, and distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -19,6 +16,11 @@
 # WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+# events-cert-autoname
+# 
+# Version: v0.1.3
+# Date: 2020-02-14
 
 # Tool to write names on a list to an image.
 # This is used to save time when generate attendance certificates for events.
